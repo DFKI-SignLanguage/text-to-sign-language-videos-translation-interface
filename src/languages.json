@@ -1,0 +1,22 @@
+[
+  { "id": 1, "name": "Deutsch" },
+  { "id": 2, "name": "Englisch" },
+  { "id": 3, "name": "Spanisch" },
+  { "id": 4, "name": "Französisch" },
+  { "id": 5, "name": "Italienisch" },
+  { "id": 6, "name": "Portugiesisch" },
+  { "id": 7, "name": "Niederländisch" },
+  { "id": 8, "name": "Russisch" },
+  { "id": 9, "name": "Chinesisch" },
+  { "id": 10, "name": "Japanisch" },
+  { "id": 11, "name": "Koreanisch" },
+  { "id": 12, "name": "Arabisch" },
+  { "id": 13, "name": "Türkisch" },
+  { "id": 14, "name": "Polnisch" },
+  { "id": 15, "name": "Schwedisch" },
+  { "id": 16, "name": "Dänisch" },
+  { "id": 17, "name": "Norwegisch" },
+  { "id": 18, "name": "Finnisch" },
+  { "id": 19, "name": "Griechisch" },
+  { "id": 20, "name": "Ungarisch" }
+]
