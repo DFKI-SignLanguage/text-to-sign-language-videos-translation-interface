@@ -6,9 +6,6 @@
     <select class="selectLanguage" v-model="sourceLanguage">
       <option v-for="(language, code) in languages" :value="code" :key="code">{{ language }}</option>
     </select>
-    <select class="selectLanguage" v-model="targetLanguage">
-      <option v-for="(language, code) in languages" :value="code" :key="code">{{ language }}</option>
-    </select>
     <button @click="translateAndGenerateVideo">Translate and Generate Video</button>
     <div>
       <h3>Translation result as sign language :</h3>
@@ -23,7 +20,6 @@ export default {
     return {
       text: '',
       sourceLanguage: 'en',
-      targetLanguage: 'fr',
       languages: {
         en: 'English',
         fr: 'French',
@@ -36,8 +32,8 @@ export default {
   },
   methods: {
     async translateAndGenerateVideo() {
-      const apiKey = 'YOUR_DEEPL_API_KEY';
-      const endpoint = `https://api.deepl.com`;
+      const apiKey = 'YOUR_API_KEY';
+      const endpoint = `https://api.signlanguage.com`;
       
       try {
         const response = await fetch(endpoint, {
@@ -46,7 +42,6 @@ export default {
           body: new URLSearchParams({
             text: this.text,
             source_lang: this.sourceLanguage,
-            target_lang: this.targetLanguage,
           }),
         });
         
