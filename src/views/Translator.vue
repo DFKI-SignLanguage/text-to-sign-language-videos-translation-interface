@@ -3,6 +3,9 @@
 <template>
   <div>
     <textarea v-model="text" placeholder="Enter text to translate"></textarea><br>
+    <h3>
+      Choose an input language:
+    </h3>
     <select class="selectLanguage" v-model="sourceLanguage">
       <option v-for="(language, code) in languages" :value="code" :key="code">{{ language }}</option>
     </select>
@@ -100,7 +103,7 @@ font-size: 18px;
 }
 
 .selectLanguage {
-    width: 150px;
+    width: 220px;
     height: 25px;
     border: 1px solid #999;
     font-size: 18px;
@@ -109,12 +112,13 @@ font-size: 18px;
     border-radius: 5px;
     box-shadow: 4px 4px #ccc;
     appearance: none;
-    background: url("@/assets/down-arrow-5.png") 96% / 15% no-repeat #eee;
+    background: url("@/assets/down-arrow-5.png") 96% / 10% no-repeat #eee;
 }
 
 button {
   width: 250px;
   height: 25px;
+  margin-left: 50px;
   border: 1px solid #999;
   font-size: 16px;
   color: hsla(160, 100%, 37%, 1);
