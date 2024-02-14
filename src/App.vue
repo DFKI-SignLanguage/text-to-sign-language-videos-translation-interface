@@ -11,9 +11,9 @@ import HelloWorld from './components/HelloWorld.vue'
       <!-- <HelloWorld msg="You did it!" /> -->
 
       <nav>
-        <!-- <RouterLink to="/">Home</RouterLink> -->
-        <RouterLink to="/">Translator</RouterLink>
-        <RouterLink to="/test">Test2</RouterLink>
+        <RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/translator">Translator</RouterLink>
+        <RouterLink to="/evaluation">Evaluation</RouterLink>
       </nav>
     </div>
   </header><br>
@@ -39,7 +39,10 @@ export default {
 header {
   line-height: 1.5;
   max-height: 100vh;
+  margin-left: -200px;
+  margin-top: -250px;
 }
+
 
 .logo {
   display: block;

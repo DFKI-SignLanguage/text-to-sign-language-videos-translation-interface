@@ -1,227 +1,316 @@
-<!-- <template>
-    <div class="card flex justify-content-center">
-        <Dropdown v-model="selectedCity" :options="cities" optionLabel="name" placeholder="Select a Language" class="w-full md:w-14rem" /><br>
-        <input type="submit" value="Übersetzen">
+<template>
+  
+ 
+  <div class="Alpha">
+     <textarea v-model="text" placeholder="Enter text to translate"></textarea><br>
+     <h3 class="languageDirection">
+       Choose the language direction:
+     </h3>
+     <select class="selectLanguage" v-model="sourceLanguage">
+       <option v-for="(language, code) in languages" :value="code" :key="code">{{ language }}</option>
+     </select>
+     <button @click="translateAndGenerateVideo">Translate and Generate Video</button>
+  </div>
+  <div class="Beta">
+    <h3>Translation result as sign language:</h3>
+    <p>{{ translation }}</p>
+    <!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/-81RIxbkE24?si=TGvuksokQRqPe4Jp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> -->
+    <!-- <video id="player" src="https://www.sign-lang.uni-hamburg.de/korpusdict/clips/4439167_1.mp4" width="520" height="380" muted="muted" autoplay="autoplay" onclick="if (this.paused) { this.play(); } else { this.pause(); }; return true;"></video>  -->
+    <video ref="video" controls width="680" height="380">
+    <source :src="videoUrl" type="video/mp4">
+    </video>
+    <div class="C">
+      <select class="selectSpeed" @change="changeSpeed" v-model="selectedSpeed">
+        <option value="0.25">0.25x</option>
+        <option value="0.5">0.5x</option>
+        <option value="1.0">1x</option>
+        <option value="1.5">1.5x</option>
+        <option value="2.0">2x</option>
+      </select>
+    </div> 
+    <div class="D">
+      <button @click="changeLastLetter('1')">front</button>
+      <button @click="changeLastLetter('2')">oblique front</button>
+      <button @click="changeLastLetter('3')">side</button>
+      <button @click="changeLastLetter('4')">from above</button>
     </div>
-</template>
-
-<script setup>
-import { ref } from "vue";
-import Dropdown from 'primevue/dropdown';
-
-const selectedCity = ref();
-const cities = ref([
-  { "id": 1, "name": "Deutsch" },
-  { "id": 2, "name": "Englisch" },
-  { "id": 3, "name": "Spanisch" },
-  { "id": 4, "name": "Französisch" },
-  { "id": 5, "name": "Italienisch" },
-  { "id": 6, "name": "Portugiesisch" },
-  { "id": 7, "name": "Niederländisch" },
-  { "id": 8, "name": "Russisch" },
-  { "id": 9, "name": "Chinesisch" },
-  { "id": 10, "name": "Japanisch" },
-  { "id": 11, "name": "Koreanisch" },
-  { "id": 12, "name": "Arabisch" },
-  { "id": 13, "name": "Türkisch" },
-  { "id": 14, "name": "Polnisch" },
-  { "id": 15, "name": "Schwedisch" },
-  { "id": 16, "name": "Dänisch" },
-  { "id": 17, "name": "Norwegisch" },
-  { "id": 18, "name": "Finnisch" },
-  { "id": 19, "name": "Griechisch" },
-  { "id": 20, "name": "Ungarisch" }
-]);
-</script> -->
-
-<!-- <template>
-    <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Translation Website</title>
-</head>
-<body>
-  <div id="app">
-    <h1>Translation Website</h1>
-    <div>
-      <label for="text">Enter text:</label>
-      <textarea id="text" v-model="inputText"></textarea>
-    </div>
-    <div>
-      <button @click="translate">Translate</button>
-    </div>
-    <div v-if="translatedText">
-      <h2>Translation:</h2>
-      <p>{{ translatedText }}</p>
-    </div>
+  </div>
+  <div class="E">
+      <h3 class="feedback">
+        Please give us your feedback on the quality of the translation you just did:
+      </h3>
+      <table class="feedbackTable">
+        <thead class="columnTitle">
+          <tr>
+            <th>Criteria</th>
+            <th>Rating</th>
+            <th>Comment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(feedback, index) in feedbackList" :key="index">
+            <td>
+              <div class="criteria">
+                {{ feedback.translation }}
+              </div>  
+            </td>
+            <td>
+              <div class="rating">
+                <button v-for="i in 5" :key="i" :class="{ active: i <= feedback.rating, 
+                  'btn-red': i === 1,
+                  'btn-orange': i === 2,
+                  'btn-yellow': i === 3,
+                  'btn-light-green': i === 4,
+                  'btn-green': i === 5 }" 
+                  @click="updateRating(index, i)">
+                  {{ i }}
+                </button>
+              </div>
+            </td>
+            <td>
+              <input type="text" style="width: 250px;" v-model="feedback.comment" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
   </div>
 
   
-</body>
-</template> -->
 
-<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="app.js"></script> -->
-
-<!-- <script>
-  data ()  {
-    return {
-    inputText: '',
-    translatedText: ''
-    }
-  },
-  methods: {
-    translate() {
-      // Make an API request to a translation service
-      axios.get('https://api.translation-service.com/translate', {
-        params: {
-          text: this.inputText,
-          from: 'en',
-          to: 'fr' // Translate from English to French (change to the desired language)
-        }
-      })
-      .then(response => {
-        this.translatedText = response.data.translation;
-      })
-      .catch(error => {
-        console.error(error);
-      });
-    }
-  }
-</script> -->
-<!-- 
-<template>
-    <div>
-      <textarea v-model="text" placeholder="Enter text to translate"></textarea>
-      <select v-model="sourceLanguage">
-        <option v-for="(language, code) in languages" :value="code" :key="code">{{ language }}</option>
-      </select>
-      <select v-model="targetLanguage">
-        <option v-for="(language, code) in languages" :value="code" :key="code">{{ language }}</option>
-      </select>
-      <button @click="translate">Translate</button>
-      <div>
-        <h3>Translation Result:</h3>
-        <p>{{ translation }}</p>
-      </div>
-    </div>
-  </template> -->
-<!--   
-  <script>
-  export default {
-    data() {
-      return {
-        text: '',
-        sourceLanguage: 'en',
-        targetLanguage: 'fr',
-        languages: {
-          en: 'English',
-          fr: 'French',
-          de: 'German',
-          es: 'Spanish',
-        },
-        translation: '',
-      };
-    },
-    methods: {
-      async translate() {
-        const apiKey = 'YOUR_DEEPL_API_KEY';
-        const endpoint = `https://api-free.deepl.com/v2/translate?auth_key=${apiKey}`;
-        
-        try {
-          const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-              text: this.text,
-              source_lang: this.sourceLanguage,
-              target_lang: this.targetLanguage,
-            }),
-          });
-          
-          const data = await response.json();
-          if (response.ok) {
-            this.translation = data.translations[0].text;
-          } else {
-            this.translation = 'Translation failed';
-            console.error(data);
-          }
-        } catch (error) {
-          this.translation = 'Translation failed';
-          console.error(error);
-        }
-      },
-    },
-  };
-  </script> -->
-<!--   
-  <style>
-
-  </style> -->
-
-  <template>
-    <main>
-        <head>
-    <title>Übersetzungswebseite</title>
-  </head>
-  <body>
-    <h1>Willkommen auf unserer Übersetzungswebseite!</h1>
-    
-    <nav>
-      <label for="text">Gib den zu übersetzenden Text ein:</label><br>
-      <textarea id="text" name="text" rows="4" cols="50"></textarea><br><br>
-      
-
-      <label for="language">Wähle die Zielsprache aus: </label>
-
-      <select id="language" name="language">
-        <option value="de">Deutsch</option>
-        <option value="en">Englisch</option>
-        <option value="fr">Französisch</option>
-        
-      </select><br><br>
-      
-      <input type="submit" value="Übersetzen">
-    </nav>
-    
-    <div id="translation">
-      <!-- Hier wird die übersetzte Version des Textes angezeigt -->
-    </div>
-    
-    
-  </body>
-    </main>
 </template>
 
 <script>
-// import { ref } from "vue";
-
-import languages from '@/languages.json'
-// import Dropdown from 'primevue/dropdown';
-
 export default {
+data() {
+  return {
+    videoUrl: 'src/assets/video_1.mp4', // Initial video URL
+    text: '',
+    sourceLanguage: 'de',
+    languages: {
+      de: 'German > DGS',
+      en: 'English > ASL',
+      fr: 'French > LSF',
+      es: 'Spanish > LSE',
+      cn: 'Chinese > CSL',
+      // Add more language codes and names as needed
+    },
+    translation: '',
+    selectedSpeed: '1.0', // Initial selected speed
+    feedbackList: [
+        { translation: 'General Quality', rating: 0, comment: '' },
+        { translation: 'Grammar', rating: 0, comment: '' },
+        // Add more translations as needed
+      ],
+  };
+},
+methods: {
+  changeSpeed() {
+    const videoElement = this.$refs.video;
+    videoElement.playbackRate = parseFloat(this.selectedSpeed);
+  },
+  changeLastLetter(lastLetter) {
+    const oldUrl = this.videoUrl
+    this.videoUrl = oldUrl.slice(0, -5) + lastLetter + ".mp4"; // Update the URL with the last letter changed
+    const videoElement = this.$refs.video;
+    videoElement.load(); // Reload the video with the new URL
+  },
+  updateRating(index, value) {
+      this.feedbackList[index].rating = value;
+    },
+    updateComment(index, text) {
+      this.feedbackList[index].comment = text;
+    },
+  async translateAndGenerateVideo() {
+    const apiKey = 'YOUR_API_KEY';
+    const endpoint = `https://api.signlanguage.com`;
     
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          text: this.text,
+          source_lang: this.sourceLanguage,
+        }),
+      });
+      
+      const data = await response.json();
+      if (response.ok) {
+        this.translation = data.translations[0].text;
+        this.generateVideo();
+      } else {
+        this.translation = 'Translation failed';
+        console.error(data);
+      }
+    } catch (error) {
+      this.translation = 'Translation failed';
+      console.error(error);
+    }
+  },
+  generateVideo() {
+    const utterance = new SpeechSynthesisUtterance(this.translation);
+    utterance.lang = this.targetLanguage;
     
-}
-
+    const audioChunks = [];
+    utterance.addEventListener('end', () => {
+      const audioBlob = new Blob(audioChunks);
+      const audioUrl = URL.createObjectURL(audioBlob);
+      this.createVideoFromAudio(audioUrl);
+    });
+    
+    utterance.addEventListener('error', (error) => {
+      console.error('Text-to-speech error:', error);
+    });
+    
+    utterance.addEventListener('audioprocess', (event) => {
+      const { inputBuffer } = event;
+      const channelData = inputBuffer.getChannelData(0);
+      const clonedData = Float32Array.from(channelData);
+      audioChunks.push(clonedData);
+    });
+    
+    speechSynthesis.speak(utterance);
+  },
+  createVideoFromAudio(audioUrl) {
+    // Here, you can use additional libraries or services to create a video from the audio URL
+    // The implementation of this step depends on your chosen video generation method
+    console.log('Video creation placeholder');
+  },
+},
+};
 </script>
 
-<!-- 
-<script>
-    // export default {
-    //     props: ['language']
-    // }
-      // Hier kannst du JavaScript-Code einfügen, um den Text zu übersetzen
-</script> -->
-
 <style>
-/* nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+textarea {
+resize: none;
+width: 500px;
+height: 300px;
+font-size: 18px;
+}
+
+.selectLanguage {
+  width: 220px;
+  height: 25px;
+  border: 1px solid #999;
+  font-size: 18px;
+  color: hsla(160, 100%, 37%, 1);
+  background-color: #eee;
+  border-radius: 5px;
+  box-shadow: 4px 4px #ccc;
+  appearance: none;
+  background: url("@/assets/down-arrow-5.png") 96% / 10% no-repeat #eee;
+}
+
+.selectSpeed {
+  width: 85px;
+  height: 25px;
+  margin-left: 595px;
+  margin-top: -20px;
+  border: 1px solid #999;
+  font-size: 15px;
+  color: hsla(160, 100%, 37%, 1);
+  background-color: #eee;
+  border-radius: 5px;
+  /* box-shadow: 4px 4px #ccc; */
+  appearance: none;
+  background: url("@/assets/down-arrow-5.png") 96% / 10% no-repeat #eee;
+  background: url("@/assets/speed.png") 96% / 40% no-repeat #eee;
+  
+}
+
+.videoSpeed {
+font-size: 10px;
+}
+
+.languageDirection {
+margin-top: 20px;
+}
+
+.Alpha{
+float: left;
+margin-top: 65px;
+}
+.Beta{
+float: left;
+margin-left: -550px;
+}
+
+.C{
+margin-top: 0px;
+}
+
+.D{
+margin-top: -20px;
+}
+
+.E{
+  margin-top: 50px;
+}
+
+/* .F{
+  margin-top: 80px;
+  margin-right: 400px;
 } */
 
+.feedback{
+  font-style: oblique;
+  font-weight: 500;
+}
+
+.feedbackTable{
+  margin-top: 20px;
+}
+
+.columnTitle{
+  font-size: 20px;
+}
+
+.criteria{
+  width: 150px;
+}
+
+button {
+width: 250px;
+height: 25px;
+margin-left: 30px;
+border: 1px solid #999;
+font-size: 16px;
+color: hsla(160, 100%, 37%, 1);
+background-color: #eee;
+border-radius: 5px;
+box-shadow: 4px 4px #ccc;
+}
+
+.rating {
+  display: flex;
+  margin-right: 50px;
+}
+
+.rating button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100px;
+}
+
+.btn-red {
+  color: red;
+}
+
+.btn-orange {
+  color: orange;
+}
+
+.btn-yellow {
+  color: #FFD700;
+}
+
+.btn-light-green {
+  color: lightgreen;
+}
+
+.btn-green {
+  color: green;
+}
 
 </style>
-  
