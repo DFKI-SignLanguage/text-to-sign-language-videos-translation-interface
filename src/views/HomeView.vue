@@ -1,7 +1,7 @@
 <template>
   
   <div class="A">
-     <textarea v-model="text" placeholder="Enter text to translate"></textarea><br>
+     <textarea v-model="text" @keydown.enter.prevent="handleEnter" placeholder="Enter text to translate"></textarea><br>
      <h3 class="languageDirection">
        Choose the language direction:
      </h3>
@@ -137,6 +137,11 @@ computed: {
   }, 
 },
 methods: {
+  handleEnter(event) {
+      if (event.keyCode === 13) {
+        this.translateAndGenerateVideo();
+      }
+    },
   selectVideo(index) {
     this.selectedVideoIndex = index;
   },
@@ -410,6 +415,10 @@ height: 300px;
 font-size: 18px;
 }
 
+select:hover{
+  cursor: pointer;
+}
+
 .selectLanguage {
   width: 220px;
   height: 25px;
@@ -428,6 +437,7 @@ font-size: 18px;
   width: 85px;
   height: 25px;
   margin-left: 595px;
+  margin-top: -30px;
   border: 1px solid #999;
   font-size: 15px;
   color: hsla(160, 100%, 37%, 1);
@@ -487,7 +497,7 @@ margin-top: 20px;
 
 .playbackspeedButton {
   float: left;
-  margin-top: 10px;
+  
 }
 
 .A{
@@ -528,6 +538,12 @@ border-radius: 5px;
 box-shadow: 4px 4px #ccc;
 }
 
+button:hover {
+  cursor:pointer; /* Change cursor style on hover */
+  background-color:gray;
+  transition: 0.7s;
+}
+
 /* Add styling for the thumbnail row and individual thumbnails */
 .thumbnail-row {
     display: flex;
@@ -535,6 +551,7 @@ box-shadow: 4px 4px #ccc;
     justify-content: flex-start;
     overflow-x: auto; /* Add horizontal scrollbar if content overflows */
     white-space: nowrap; /* Prevents videos from wrapping to the next line */
+    margin-top: 20px;
   }
 
 .thumbnail-row video {
