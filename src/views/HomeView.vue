@@ -11,7 +11,7 @@
      <button @click="translateAndGenerateVideo">Translate and Generate Video</button>
   </div>
   <div class="B">
-    <h3>Translation result as sign-language:</h3>
+    <h3>Translation result as sign language:</h3>
     <p>{{ translation }}</p>
     <!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/-81RIxbkE24?si=TGvuksokQRqPe4Jp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> -->
     <!-- <video id="player" src="https://www.sign-lang.uni-hamburg.de/korpusdict/clips/4439167_1.mp4" width="520" height="380" muted="muted" autoplay="autoplay" onclick="if (this.paused) { this.play(); } else { this.pause(); }; return true;"></video>  -->
