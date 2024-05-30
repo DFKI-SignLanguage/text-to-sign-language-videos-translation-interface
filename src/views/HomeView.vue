@@ -1,112 +1,102 @@
 <template>
   
   <div class="A">
-     <textarea v-model="text" @keydown.enter.prevent="handleEnter" placeholder="Enter text to translate"></textarea><br>
-     <h3 class="languageDirection">
-       Choose the language direction:
-     </h3>
-     <select class="selectLanguage" v-model="sourceLanguage">
-       <option v-for="(language, code) in languages" :value="code" :key="code">{{ language }}</option>
-     </select>
-     <button @click="translateAndGenerateVideo">Translate and Generate Video</button>
+    <textarea v-model="text" @keydown.enter.prevent="handleEnter" placeholder="Enter text to translate"></textarea><br>
+    <h3 class="languageDirection">
+      Choose the language direction:
+    </h3>
+    <select class="selectLanguage" v-model="sourceLanguage">
+      <option v-for="(language, code) in languages" :value="code" :key="code">{{ language }}</option>
+    </select>
+    <button @click="translateAndGenerateVideo">Translate and Generate Video</button>
   </div>
   <div class="B">
     <h3>Translation result as sign language:</h3>
     <p>{{ translation }}</p>
-    <!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/-81RIxbkE24?si=TGvuksokQRqPe4Jp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> -->
-    <!-- <video id="player" src="https://www.sign-lang.uni-hamburg.de/korpusdict/clips/4439167_1.mp4" width="520" height="380" muted="muted" autoplay="autoplay" onclick="if (this.paused) { this.play(); } else { this.pause(); }; return true;"></video>  -->
-   <!--  <video ref="video" controls width="680" height="380">
-    <source :src="videoUrl" type="video/mp4">
-    </video> -->
-    <!-- <div v-for="(videoSource, index) in videoSources" :key="index">
-      <video controls width="400">
-        <source :src="videoSource" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
-    </div> -->
-    <div class="video-container">
 
+    <div class="video-container">
       <!-- <div class="main-video"> -->
       <div class="prevPreview-video" v-show="currentVideoIndex !== 0">
         <video :src="videos[currentVideoIndex - 1]" controls muted style="max-width: 150px;"></video>
       </div>
       <button class="prevVideo" @click="prevVideo" v-show="currentVideoIndex !== 0">&lt;</button>
       <div class="current-video">
-        <video ref="video" :src="currentVideoSource" controls></video>
-        <div class="perspective">
-         <button @click="changeLastLetter('1')">front</button>
-         <button @click="changeLastLetter('2')">oblique front</button>
-         <button @click="changeLastLetter('3')">side</button>
-         <button @click="changeLastLetter('4')">from above</button>
+        <div v-if="currentVideoSource">
+          <video ref="video" :src="currentVideoSource" controls></video>
+          <div class="perspective">
+            <button @click="changeLastLetter('1')">front</button>
+            <button @click="changeLastLetter('2')">oblique front</button>
+            <button @click="changeLastLetter('3')">side</button>
+            <button @click="changeLastLetter('4')">from above</button>
+          </div>
+          <div class="playbackspeedButton"></div>
+          <select class="selectSpeed" @change="changeSpeed" v-model="selectedSpeed">
+            <option value="0.1">0.1x</option>
+            <option value="0.25">0.25x</option>
+            <option value="0.5">0.5x</option>
+            <option value="1.0">1x</option>
+            <option value="1.5">1.5x</option>
+          </select>
         </div>
-        <div class="playbackspeedButton"></div>
-        <select class="selectSpeed" @change="changeSpeed" v-model="selectedSpeed">
-          <option value="0.1">0.1x</option>
-          <option value="0.25">0.25x</option>
-          <option value="0.5">0.5x</option>
-          <option value="1.0">1x</option>
-          <option value="1.5">1.5x</option>
-        </select>
+
+        <div v-else>
+          <div class="main-video-placeholder" v-show="!currentVideoSource">
+          <!-- This div will show when there is no current video -->
+            <div class="video-overlay">
+              <font-awesome-icon icon="play" />
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="nextPreview-video" v-show="currentVideoIndex !== videos.length - 1">
+      <div class="nextPreview-video" v-if="currentVideoSource" v-show="currentVideoIndex !== videos.length - 1">
         <video :src="videos[currentVideoIndex + 1]" controls muted style="max-width: 150px;"></video>
       </div>
-      <button class="nextVideo" @click="nextVideo" v-show="currentVideoIndex !== videos.length - 1">&gt;</button>
+      <button class="nextVideo" v-if="currentVideoSource" @click="nextVideo" v-show="currentVideoIndex !== videos.length - 1">&gt;</button>
     </div>
 
     <!-- Thumbnails row -->
     <div class="thumbnail-row">
-  <div v-for="(video, index) in videos" :key="index" class="thumbnail-container">
-    <video
-      :src="video"
-      @click="switchMainVideo(index)"
-      :class="{ 'playing': index === currentVideoIndex }"
-      poster=""
-      alt="Video Thumbnail"
-      muted
-      style="width: 150px;"
-    ></video>
-    <!-- Display the word underneath the thumbnail -->
-    <div class="word-overlay">{{ translatedWords[index] }}</div>
-  </div>
-</div>
-    <div class="controls">
-    <button @click="playAllVideos">Play All Videos</button>
-    <button @click="stopPlaying">Stop</button>
+      <div v-for="(video, index) in videos" :key="index" class="thumbnail-container">
+        <video
+          :src="video"
+          @click="switchMainVideo(index)"
+          :class="{ 'playing': index === currentVideoIndex }"
+          poster=""
+          alt="Video Thumbnail"
+          muted
+          style="width: 150px;"
+        ></video>
+        <!-- Display the word underneath the thumbnail -->
+        <div class="word-overlay">{{ translatedWords[index] }}</div>
+      </div>
     </div>
-   <!-- </div> -->
-
-<!--     <div class="C">
-      <select class="selectSpeed" @change="changeSpeed" v-model="selectedSpeed">
-        <option value="0.25">0.25x</option>
-        <option value="0.5">0.5x</option>
-        <option value="1.0">1x</option>
-        <option value="1.5">1.5x</option>
-        <option value="2.0">2x</option>
-      </select>
-    </div>  -->
-    <!-- <div class="D">
-      <button @click="changeLastLetter('1')">front</button>
-      <button @click="changeLastLetter('2')">oblique front</button>
-      <button @click="changeLastLetter('3')">side</button>
-      <button @click="changeLastLetter('4')">from above</button>
-    </div> -->
+    <div class="controls">
+      <button @click="playAllVideos">Play All Videos</button>
+      <button @click="stopPlaying">Stop</button>
+    </div>
   </div>
-  
+
+  <div>
+    <h3 class="prototype-note">This is a prototype as part of a scientific thesis. The translation logic is not implemented yet, which is why it is only possible to translate example sentences. These sentences can be found here:
+      <a href="https://forms.gle/D2TWbPP9goM3MuR18" target="_blank">Google Forms Survey</a>
+      The videos are from the DGS corpus project, click here to go to their website:
+      <a href="https://www.sign-lang.uni-hamburg.de/korpusdict/overview/intro.html" target="_blank">DGS-Korpus</a>
+    </h3>
+  </div>
 </template>
 
 <script>
-import video1 from "@/assets/video_1.mp4";
-import video2 from "@/assets/4427585_1.mp4";
-import video3 from "@/assets/4363934_1.mp4";
-import video4 from "@/assets/4440583_1.mp4";
+import video1 from "@/assets/videos/video_1.mp4";
+import video2 from "@/assets/videos/4427585_1.mp4";
+import video3 from "@/assets/videos/4363934_1.mp4";
 import axios from 'axios';
+import { faPlay } from '@fortawesome/free-solid-svg-icons';
 
 
 export default {
 data() {
   return {
-    videos: [video1, video2, video3, video4],
+    videos: [],
     currentVideoIndex: 0,
     selectedVideoIndex: null,
     baseVideoWidth: 300, // Adjust the base width as needed
@@ -118,10 +108,10 @@ data() {
     sourceLanguage: 'de',
     languages: {
       de: 'German > DGS',
-      en: 'English > ASL',
+/*       en: 'English > ASL',
       fr: 'French > LSF',
       es: 'Spanish > LSE',
-      cn: 'Chinese > CSL',
+      cn: 'Chinese > CSL', */
       // Add more language codes and names as needed
     },
     translation: '',
@@ -217,115 +207,76 @@ methods: {
     }
   },
   switchMainVideo(index) {
-   // Switch the main video when a thumbnail is clicked
-      this.currentVideoIndex = index;
+    // Switch the main video when a thumbnail is clicked
+    this.currentVideoIndex = index;
   
-      // Use $nextTick to ensure that the DOM has been updated
-      this.$nextTick(() => {
-        // Update the src attribute for the new main video
-        const currentVideo = this.videos[this.currentVideoIndex];
-        this.$refs.video.src = currentVideo;
-        this.$refs.video.load(); // Reload the video to apply the changes
-     });
+    // Use $nextTick to ensure that the DOM has been updated
+    this.$nextTick(() => {
+      // Update the src attribute for the new main video
+      const currentVideo = this.videos[this.currentVideoIndex];
+      this.$refs.video.src = currentVideo;
+      this.$refs.video.load(); // Reload the video to apply the changes
+    });
   },
   async translateAndGenerateVideo() {
-        try {
-          // Retrieve CSRF token from cookie if necessary
-          const csrftoken = this.getCookie('csrftoken');
-          console.log('CSRF Token:', csrftoken);
+    try {
+      // Retrieve CSRF token from cookie if necessary
+      const csrftoken = this.getCookie('csrftoken');
+      console.log('CSRF Token:', csrftoken);
   
-          console.log('Text:', this.text);
+      console.log('Text:', this.text);
   
-          // Make a POST request to your Django backend
-          const response = await axios.post(
-            'http://localhost:8000/api/translate/',
-            {
-              text: this.text,
-              source_language: this.sourceLanguage,
-            },
-            {
-              headers: {
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/x-www-form-urlencoded',
-              },
-            }
-          );
-  
-          // Log the response from the backend
-          console.log('Backend Response:', response.data);
-  
-          // Handle the response from the backend
-          const { translated_words } = response.data;
-          console.log('Translated words:', translated_words);
-          this.translatedWords = translated_words.map(tuple => tuple[0]); // Set translatedWords with the received data
-  
-          // Extract video URLs from the translated words
-          // const translatedWordsArray = Object.values(translated_words);
-  
-          // Update the videos array in your component state
-          /* this.videos = await Promise.all(Object.values(translated_words).map(async (word, index) => {
-              // Log the word to check its structure
-              console.log('Word:', word);
-  
-              // Assuming each word is a string representing the file name without extension
-              const videoPath = `../assets/${word}`;
-              console.log('Importing video for path:', videoPath);
-  
-              try {
-                  const { default: video } = await import(videoPath);
-                  return video;
-              } catch (importError) {
-                  console.error('Error importing video:', importError);
-                  return null;
-              }
-          })); */
-
-          // Update the videos array in your component state
-          this.videos = await Promise.all(translated_words.map(async (tuple, index) => {
-              const [word, videoUrl] = tuple; // Destructure the tuple to get the second element (video URL)
-              
-              // Log the video URL to check its structure
-              console.log('Video URL:', videoUrl);
-
-              // Create a new video element for each URL
-      /* const video = document.createElement('video');
-      video.src = `../assets/${videoUrl}`;
-      video.controls = true; // Enable controls for the video
-      video.muted = true; // Mute the video
-      return video; */
-          
-              const videoPath = `../assets/${videoUrl}`;
-              console.log('Importing video for path:', videoPath);
-          
-              try {
-                  const { default: video } = await import(videoPath);
-                  return video;
-              } catch (importError) {
-                  console.error('Error importing video:', importError);
-                  return null;
-              }
-          }));
-  
-  
-          // Extract and save video paths as video1, video2, etc.
-          /* Object.values(translated_words).forEach((word, index) => {
-               this.$set(this.videos, index, word.path);
-             }); */
-  
-          // Now you can use the translated words and their video URLs as needed
-          // For example, update the videos array in your component state
-          // this.videos = Object.values(translated_words);
-  
-          // Rest of your code...
-        } catch (error) {
-          console.error('Error translating text:', error);
+      // Make a POST request to your Django backend
+      const response = await axios.post(
+        'http://janis.9kmzimzwnemgjob5.myfritz.net:5174/api/translate/',
+        {
+          text: this.text,
+          source_language: this.sourceLanguage,
+        },
+        {
+          headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
         }
+      );
+  
+      // Log the response from the backend
+      console.log('Backend Response:', response.data);
+  
+      // Handle the response from the backend
+      const { translated_words } = response.data;
+      console.log('Translated words:', translated_words);
+      this.translatedWords = translated_words.map(tuple => tuple[0]); // Set translatedWords with the received data
+
+      // Update the videos array in your component state
+      this.videos = await Promise.all(translated_words.map(async (tuple, index) => {
+        const [word, videoUrl] = tuple; // Destructure the tuple to get the second element (video URL)
+              
+        // Log the video URL to check its structure
+        console.log('Video URL:', videoUrl);
+        const videoPath = `../assets/videos/${videoUrl}`;
+        console.log('Importing video for path:', videoPath);
+          
+        try {
+          const { default: video } = await import(videoPath);
+          return video;
+        } catch (importError) {
+            console.error('Error importing video:', importError);
+            return null;
+          }
+      }));
+  
+  
+    } catch (error) {
+        console.error('Error translating text:', error);
+      }
   },
   // Utility function to retrieve a cookie value by name
   getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(';').shift();
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
   },
   async playAllVideos() {
     // Get the main video element
@@ -341,7 +292,6 @@ methods: {
             video.playbackRate = parseFloat(this.selectedSpeed);
         });
     };
-
     // Iterate through each video in the 'videos' array
     for (let i = 0; i < this.videos.length; i++) {
       // Update the 'currentVideoIndex' to play the next video
@@ -372,10 +322,8 @@ methods: {
       const thumbnailRow = document.querySelector('.thumbnail-row');
       thumbnailRow.scrollLeft += 160; // Adjust the value based on your thumbnail width
 
-
       // You can add a delay here if needed
       // await new Promise(resolve => setTimeout(resolve, 2000));
-
     }
     // Remove the event listener after all videos have been played
     mainVideo.removeEventListener('ended', this.playNextVideo);
@@ -390,29 +338,41 @@ methods: {
     }
   },
   stopPlaying() {
-      // Get the main video element
-      const mainVideo = this.$refs.video;
+    // Get the main video element
+    const mainVideo = this.$refs.video;
 
-      // Pause and reset the video
-      mainVideo.pause();
-      mainVideo.currentTime = 0;
+    // Pause and reset the video
+    mainVideo.pause();
+    mainVideo.currentTime = 0;
 
-      // Reload the video by setting the src attribute again
-      mainVideo.src = this.videos[this.currentVideoIndex];
+    // Reload the video by setting the src attribute again
+    mainVideo.src = this.videos[this.currentVideoIndex];
 
-      // Remove the event listener
-      mainVideo.removeEventListener('ended', this.playNextVideo);
+    // Remove the event listener
+    mainVideo.removeEventListener('ended', this.playNextVideo);
   },
 },
 };
 </script>
 
 <style>
+#app {
+  max-width: 900px;
+  max-height: 500px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+body {
+  overflow-y: scroll;
+}
+
 textarea {
-resize: none;
-width: 500px;
-height: 300px;
-font-size: 18px;
+  width: 100%; /* Use 100% width to fill the container */
+  max-width: 500px; /* Set maximum width to prevent textarea from becoming too wide */
+  height: 200px; /* Adjust height as needed */
+  font-size: 18px;
 }
 
 select:hover{
@@ -447,27 +407,31 @@ select:hover{
   appearance: none;
   background: url("@/assets/down-arrow-5.png") 96% / 10% no-repeat #eee;
   background: url("@/assets/speed.png") 96% / 40% no-repeat #eee;
-  
+}
+
+.selectLanguage, .selectSpeed {
+  width: 100%; /* Use 100% width to fill the container */
+  max-width: 220px; /* Set maximum width to prevent dropdown from becoming too wide */
+  height: 25px;
+  font-size: 18px;
 }
 
 .videoSpeed {
 font-size: 10px;
 }
 
-
 .video-container {
-  /* display: flex;
-  white-space: nowrap; */ /* Prevents videos from wrapping to the next line */
-  /* overflow-x: auto; */ /* Add horizontal scrollbar if content overflows */
-  /* height: 400px; */
-  /* width: 1800px;  */
-  /* padding-right: 20px; */ /* Add padding to ensure the scrollbar doesn't overlap content */
-  /* margin-right: -800px; */
   display: flex;
   align-items: center;
   justify-content: space-between;
   max-width: 600px;
   margin: 0 auto;
+}
+
+.current-video video {
+  width: 100%; /* Use 100% width to fill the container */
+  max-width: 600px; /* Set maximum width for the video */
+  height: auto; /* Automatically adjust height */
 }
 
 .current-video {
@@ -508,23 +472,9 @@ margin-left: -200px;
 
 .B{
 float: left;
-margin-right: 220px;
+margin-right: 20px;
 margin-left: 200px;
 }
-
-.C{
-float: left;
-margin-top: 0px;
-margin-left: 190px;
-}
-
-.D{
-float: left;
-margin-top: -20px;
-margin-left: 190px;
-margin-right: 50px;
-}
-
 
 button {
 width: 250px;
@@ -552,14 +502,14 @@ button:hover {
     overflow-x: auto; /* Add horizontal scrollbar if content overflows */
     white-space: nowrap; /* Prevents videos from wrapping to the next line */
     margin-top: 20px;
+    flex-wrap: nowrap; /* Prevent thumbnails from wrapping to the next line */
   }
 
-.thumbnail-row video {
-  max-width:150px; /* Set the maximum width for the thumbnail videos */
-  width: 100%; /* Make sure the width is responsive within the maximum limit */
-  height: auto; /* Automatically adjust the height while maintaining aspect ratio */
-  margin-right: 10px; /* Adjust the margin as needed */
-  cursor: pointer;
+  .thumbnail-row video {
+  max-width: 150px;
+  width: auto;
+  height: auto;
+  margin-right: 10px;
 }
 
 .thumbnail-row video.playing {
@@ -577,7 +527,7 @@ button:hover {
   transform: translateX(-50%);
   background-color: rgba(255, 255, 255, 0.8);
   padding: 2px 5px;
-  font-size: 9px;
+  font-size: 14px;
   white-space: nowrap;
   border-radius: 5px;
 }
@@ -589,5 +539,26 @@ button:hover {
 
 .controls {
   margin-top: 20px;
+}
+
+.main-video-placeholder {
+  width: 100%;
+  height: 380px; /* Adjust the height as needed */
+  background-color: #f5f5f5; /* Grey background color */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-overlay {
+  font-size: 50px; /* Adjust the size of the icon */
+  color: #555; /* Icon color */
+}
+
+.prototype-note {
+  margin-top: 50px;
+  margin-left: -200px;
+  width: 200%;
+  text-align: justify;
 }
 </style>

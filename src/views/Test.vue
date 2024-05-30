@@ -27,11 +27,12 @@
     <div class="video-container">
 
       <!-- <div class="main-video"> -->
-      <div class="prevPreview-video" v-show="currentVideoIndex !== 0">
+        <div class="prevPreview-video" v-show="currentVideoIndex !== 0">
         <video :src="videos[currentVideoIndex - 1]" controls muted style="max-width: 150px;"></video>
       </div>
       <button class="prevVideo" @click="prevVideo" v-show="currentVideoIndex !== 0">&lt;</button>
       <div class="current-video">
+        <div v-if="currentVideoSource">
         <video ref="video" :src="currentVideoSource" controls></video>
         <div class="perspective">
          <button @click="changeLastLetter('1')">front</button>
@@ -48,10 +49,20 @@
           <option value="1.5">1.5x</option>
         </select>
       </div>
-      <div class="nextPreview-video" v-show="currentVideoIndex !== videos.length - 1">
+
+    <div v-else>
+      <div class="main-video-placeholder" v-show="!currentVideoSource">
+      <!-- This div will show when there is no current video -->
+          <div class="video-overlay">
+            <font-awesome-icon icon="play" />
+          </div>
+        </div>
+      </div>
+    </div>
+      <div class="nextPreview-video" v-if="currentVideoSource" v-show="currentVideoIndex !== videos.length - 1">
         <video :src="videos[currentVideoIndex + 1]" controls muted style="max-width: 150px;"></video>
       </div>
-      <button class="nextVideo" @click="nextVideo" v-show="currentVideoIndex !== videos.length - 1">&gt;</button>
+      <button class="nextVideo" v-if="currentVideoSource" @click="nextVideo" v-show="currentVideoIndex !== videos.length - 1">&gt;</button>
     </div>
 
     <!-- Thumbnails row -->
@@ -82,7 +93,7 @@
     <h3 class="feedback">
       Please give us your feedback on the quality of the translation you just did:
     </h3>
-    <table class="feedbackTable">
+<!--     <table class="feedbackTable">
       <thead class="columnTitle">
         <tr>
           <th style="width: 250px;">Words:</th>
@@ -90,9 +101,9 @@
           <th>Comment</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody> -->
         <!-- Loop through each word in the translatedWords array -->
-        <tr v-for="(word, index) in uniqueTranslatedWords" :key="index">
+<!--         <tr v-for="(word, index) in uniqueTranslatedWords" :key="index">
           <td>
             <div class="criteria" style="font-size:25px;">
                 {{ word }}
@@ -114,7 +125,7 @@
           <td>
             <input type="text" style="width: 250px;" v-model="overallComment" />
           </td>
-        </tr>
+        </tr> -->
         <!-- <tr>
       <td>
         <label for="sentence-rating">Overall Sentence Rating:</label>
@@ -136,41 +147,71 @@
         <input type="text" style="width: 250px;" v-model="overallComment" />
       </td>
     </tr> -->
-      </tbody>
-    </table>
+<!--       </tbody>
+    </table> -->
 
     <div class="feedback">
   <table class="feedbackTable">
     <thead class="columnTitle">
       <tr>
         <th></th>
-        <th style="width: 4600px;">Overall Sentence Rating:</th>
+        <th style="width: 4600px;">Criteria:</th>
         <th>Rating</th>
         <th>Comment</th>
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td></td> <!-- Empty first column -->
-        <td style="font-size:25px;">Sentence</td>
-        <td>
-          <div class="rating">
-            <button v-for="i in 5" :key="i" :class="{ active: i <= overallRating, 
-              'btn-red': i === 1,
-              'btn-orange': i === 2,
-              'btn-yellow': i === 3,
-              'btn-light-green': i === 4,
-              'btn-green': i === 5 }" 
-              @click="updateOverallRating(i)">
-              {{ i }}
-            </button>
-          </div>
-        </td>
-        <td>
-          <input type="text" style="width: 250px;" v-model="overallComment" />
-        </td>
-      </tr>
-    </tbody>
+  <tr>
+    <td></td> <!-- Empty first column -->
+    <td style="font-size: 25px;">Fluency</td>
+    <td>
+      <div class="rating">
+        <!-- For loop to generate rating buttons for Fluency -->
+        <button v-for="i in 5" :key="'fluency-' + i" :class="getButtonClasses(i, 'fluency')" @click="updateRating(i, 'fluency')">
+          {{ i }}
+        </button>
+      </div>
+    </td>
+    <td>
+      <input type="text" style="width: 250px;" v-model="fluencyComment" />
+    </td>
+  </tr>
+  
+  <!-- Add similar rows for Adequacy and Overall Scores -->
+  
+  <tr>
+    <td></td> <!-- Empty first column -->
+    <td style="font-size: 25px;">Adequacy</td>
+    <td>
+      <div class="rating">
+        <!-- For loop to generate rating buttons for Adequacy -->
+        <button v-for="i in 5" :key="'adequacy-' + i" :class="getButtonClasses(i, 'adequacy')" @click="updateRating(i, 'adequacy')">
+          {{ i }}
+        </button>
+      </div>
+    </td>
+    <td>
+      <input type="text" style="width: 250px;" v-model="adequacyComment" />
+    </td>
+  </tr>
+  
+  <tr>
+    <td></td> <!-- Empty first column -->
+    <td style="font-size: 25px;">Overall Scores</td>
+    <td>
+      <div class="rating">
+        <!-- For loop to generate rating buttons for Overall Scores -->
+        <button v-for="i in 5" :key="'overall-' + i" :class="getButtonClasses(i, 'overall')" @click="updateRating(i, 'overall')">
+          {{ i }}
+        </button>
+      </div>
+    </td>
+    <td>
+      <input type="text" style="width: 250px;" v-model="overallComment" />
+    </td>
+  </tr>
+</tbody>
+
   </table>
 </div>
 
@@ -189,7 +230,7 @@ import axios from 'axios';
 export default {
 data() {
   return {
-    videos: [video1, video2, video3, video4],
+    videos: [],
     currentVideoIndex: 0,
     selectedVideoIndex: null,
     baseVideoWidth: 300, // Adjust the base width as needed
@@ -213,8 +254,12 @@ data() {
     selectedPerspective: '1',
     translatedWords: [], // Define translatedWords as an empty array initially
     feedbackList: [],
+    fluencyRating: 0,
+    adequacyRating: 0,
     overallRating: 0,
-    overallComment: '',
+    fluencyComment: '',
+    adequacyComment: '',
+    overallComment: ''
   };
 },
 computed: {
@@ -327,7 +372,7 @@ methods: {
   
           // Make a POST request to your Django backend
           const response = await axios.post(
-            'http://localhost:8000/api/translate/',
+            'http://janis.9kmzimzwnemgjob5.myfritz.net:5174/api/translate/',
             {
               text: this.text,
               source_language: this.sourceLanguage,
@@ -376,7 +421,7 @@ methods: {
               // Log the video URL to check its structure
               console.log('Video URL:', videoUrl);
           
-              const videoPath = `../assets/${videoUrl}`;
+              const videoPath = `../assets/videos/${videoUrl}`;
               console.log('Importing video for path:', videoPath);
           
               try {
@@ -494,6 +539,38 @@ methods: {
     const entry = this.feedbackList.find(item => item.translation === word);
     // If entry is found, return its comment, otherwise return an empty string
     return entry ? entry.comment : '';
+  },
+  updateRating(rating, type) {
+    // Update the rating based on the type (fluency, adequacy, overall)
+    if (type === 'fluency') {
+      this.fluencyRating = rating;
+    } else if (type === 'adequacy') {
+      this.adequacyRating = rating;
+    } else if (type === 'overall') {
+      this.overallRating = rating;
+    }
+  },
+  getButtonClasses(rating, type) {
+    // Dynamically set button classes based on rating and type
+    return {
+      active: rating <= this.getRating(type),
+      'btn-red': rating === 1,
+      'btn-orange': rating === 2,
+      'btn-yellow': rating === 3,
+      'btn-light-green': rating === 4,
+      'btn-green': rating === 5
+    };
+  },
+  getRating(type) {
+    // Get the current rating based on the type (fluency, adequacy, overall)
+    if (type === 'fluency') {
+      return this.fluencyRating;
+    } else if (type === 'adequacy') {
+      return this.adequacyRating;
+    } else if (type === 'overall') {
+      return this.overallRating;
+    }
+    return 0;
   },
 },
 };
@@ -650,7 +727,7 @@ box-shadow: 4px 4px #ccc;
   transform: translateX(-50%);
   background-color: rgba(255, 255, 255, 0.8);
   padding: 2px 5px;
-  font-size: 9px;
+  font-size: 14px;
   white-space: nowrap;
   border-radius: 5px;
 }
@@ -662,6 +739,20 @@ box-shadow: 4px 4px #ccc;
 
 .controls {
   margin-top: 20px;
+}
+
+.main-video-placeholder {
+  width: 100%;
+  height: 380px; /* Adjust the height as needed */
+  background-color: #f5f5f5; /* Grey background color */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-overlay {
+  font-size: 50px; /* Adjust the size of the icon */
+  color: #555; /* Icon color */
 }
 
 .feedback{

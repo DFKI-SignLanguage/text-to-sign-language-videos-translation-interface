@@ -1,19 +1,19 @@
 <template>
   
   <div class="A">
-     <textarea v-model="text" placeholder="Enter text to translate"></textarea><br>
-     <h3 class="languageDirection">
-       Choose the language direction:
-     </h3>
-     <select class="selectLanguage" v-model="sourceLanguage">
-       <option v-for="(language, code) in languages" :value="code" :key="code">{{ language }}</option>
-     </select>
-     <button @click="translateAndGenerateVideo">Translate and Generate Video</button>
+    <textarea v-model="text" placeholder="Enter text to translate"></textarea><br>
+    <h3 class="languageDirection">
+      Choose the language direction:
+    </h3>
+    <select class="selectLanguage" v-model="sourceLanguage">
+      <option v-for="(language, code) in languages" :value="code" :key="code">{{ language }}</option>
+    </select>
+    <button @click="translateAndGenerateVideo">Translate and Generate Video</button>
   </div>
   <div class="B">
     <h3>Translation result as sign language:</h3>
-	<div class="video-container">
-	<div class="prevPreview-video" v-show="currentVideoIndex !== 0">
+    <div class="video-container">
+	    <div class="prevPreview-video" v-show="currentVideoIndex !== 0">
         <video :src="videos[currentVideoIndex - 1]" controls muted style="max-width: 150px;"></video>
       </div>
       <button class="prevVideo" @click="prevVideo" v-show="currentVideoIndex !== 0">&lt;</button>
@@ -52,7 +52,19 @@
         muted
       ></video>
     </div>
-</div>
+  </div>
+
+  <div>
+    <h3 class="prototype-note">This is a prototype as part of a scientific thesis. The translation logic is not implemented yet, which is why it is only possible to translate example sentences. These sentences can be found here:
+      <a href="https://forms.gle/D2TWbPP9goM3MuR18" target="_blank">Google Forms Survey</a>
+    </h3>
+  </div>
+  <div>
+    <h3>
+      The videos are from the DGS corpus project, click here to go to their website:
+      <a href="https://www.sign-lang.uni-hamburg.de/korpusdict/overview/intro.html" target="_blank">DGS-Korpus</a>
+    </h3>
+  </div>
   
 </template>
 
@@ -220,13 +232,6 @@ font-size: 10px;
 
 
 .video-container {
-  /* display: flex;
-  white-space: nowrap; */ /* Prevents videos from wrapping to the next line */
-  /* overflow-x: auto; */ /* Add horizontal scrollbar if content overflows */
-  /* height: 400px; */
-  /* width: 1800px;  */
-  /* padding-right: 20px; */ /* Add padding to ensure the scrollbar doesn't overlap content */
-  /* margin-right: -800px; */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -272,23 +277,9 @@ margin-left: -200px;
 
 .B{
 float: left;
-margin-right: 220px;
+margin-right: 20px;
 margin-left: 200px;
 }
-
-.C{
-float: left;
-margin-top: 0px;
-margin-left: 190px;
-}
-
-.D{
-float: left;
-margin-top: -20px;
-margin-left: 190px;
-margin-right: 50px;
-}
-
 
 button {
 width: 250px;
@@ -304,20 +295,20 @@ box-shadow: 4px 4px #ccc;
 
 /* Add styling for the thumbnail row and individual thumbnails */
 .thumbnail-row {
-    display: flex;
-    justify-content: flex-start;
-  }
+  display: flex;
+  justify-content: flex-start;
+}
 
-  .thumbnail-row video {
-    max-width: 150px; /* Set the maximum width for the thumbnail videos */
-    width: 100%; /* Make sure the width is responsive within the maximum limit */
-    height: auto; /* Automatically adjust the height while maintaining aspect ratio */
-    margin-right: 10px; /* Adjust the margin as needed */
-    cursor: pointer;
-  }
+.thumbnail-row video {
+  max-width: 150px; /* Set the maximum width for the thumbnail videos */
+  width: 100%; /* Make sure the width is responsive within the maximum limit */
+  height: auto; /* Automatically adjust the height while maintaining aspect ratio */
+  margin-right: 10px; /* Adjust the margin as needed */
+  cursor: pointer;
+}
 
-  .main-video {
-    /* Adjust styling for the main video container as needed */
-    display: flex;
-  }
+.main-video {
+  /* Adjust styling for the main video container as needed */
+  display: flex;
+}
 </style>

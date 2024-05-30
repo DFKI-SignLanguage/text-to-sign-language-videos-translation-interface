@@ -5,14 +5,14 @@ import HelloWorld from './components/HelloWorld.vue'
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+    <img alt="Vue logo" class="logo" src="@/assets/dgs_symbol_57.png" width="125" height="125" />
 
     <div class="wrapper">
       <!-- <HelloWorld msg="You did it!" /> -->
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/translator">Translator</RouterLink>
+        <!-- <RouterLink to="/translator">Translator</RouterLink> -->
         <RouterLink to="/evaluation">Evaluation</RouterLink>
       </nav>
     </div>
@@ -23,6 +23,7 @@ import HelloWorld from './components/HelloWorld.vue'
 
 <script>
 import languages from './languages.json'
+
 
 
 export default {
@@ -43,6 +44,12 @@ header {
   margin-top: -100px;
 }
 
+#app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
 
 .logo {
   display: block;
